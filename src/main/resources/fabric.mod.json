@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "rapsolcrossbowindicator",
+	"version": "${version}",
+	"name": "RapsolCrossbowIndicator",
+	"description": "Makes you see which crossbow has which enchantment",
+	"authors": [
+		"Rapsol9398"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "Proprietary",
+	"licenseDetails": "View LICENSE.txt file for details",
+	"icon": "assets/crossbowindicator/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"com.rapsol.CrossbowindIcator"
+		]
+	},
+	"mixins": [
+		"crossbowindicator.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
