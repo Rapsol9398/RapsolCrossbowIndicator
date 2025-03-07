@@ -10,7 +10,6 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,36 +26,33 @@ public abstract class CrossbowSlotMixin {
 	private static final Identifier greenOverlay = Identifier.of("crossbowindicator", "textures/gui/green_slot.png");
 
 	@Inject(method = "drawSlot", at = @At("HEAD"))
-	private void changeSlotBackground(DrawContext context, Slot slot, CallbackInfo ci) {
+	private void highlightInventoryCrossbowSlot(DrawContext context, Slot slot, CallbackInfo ci) {
 		ItemStack stack = slot.getStack();
+		if (!stack.isOf(Items.CROSSBOW)) return;
 
-		if (stack.isOf(Items.CROSSBOW)) {
-			AtomicReference<Identifier> overlay = new AtomicReference<>(null);
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world == null) return;
 
-			if (stack.hasEnchantments()) {
-				MinecraftClient client = MinecraftClient.getInstance();
-				World world = client.world;
+		AtomicReference<Identifier> overlay = new AtomicReference<>(null);
 
-				if (world != null) {
-					var enchantmentRegistry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
+		if (stack.hasEnchantments()) {
+			var enchantmentRegistry = client.world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
 
-					enchantmentRegistry.getEntry(Enchantments.MULTISHOT.getValue()).ifPresent(multishotEntry -> {
-						if (EnchantmentHelper.getLevel(multishotEntry, stack) > 0) {
-							overlay.set(redOverlay);
-						}
-					});
-
-					enchantmentRegistry.getEntry(Enchantments.PIERCING.getValue()).ifPresent(piercingEntry -> {
-						if (EnchantmentHelper.getLevel(piercingEntry, stack) > 0) {
-							overlay.set(greenOverlay);
-						}
-					});
+			enchantmentRegistry.getEntry(Enchantments.MULTISHOT.getValue()).ifPresent(multishotEntry -> {
+				if (EnchantmentHelper.getLevel(multishotEntry, stack) > 0) {
+					overlay.set(redOverlay);
 				}
-			}
+			});
 
-			if (overlay.get() != null) {
-				context.drawTexture(overlay.get(), slot.x - 1, slot.y - 1, 0, 0, 18, 18);
-			}
+			enchantmentRegistry.getEntry(Enchantments.PIERCING.getValue()).ifPresent(piercingEntry -> {
+				if (EnchantmentHelper.getLevel(piercingEntry, stack) > 0) {
+					overlay.set(greenOverlay);
+				}
+			});
+		}
+
+		if (overlay.get() != null) {
+			context.drawTexture(overlay.get(), slot.x, slot.y, 0, 0, 16, 16);
 		}
 	}
 }
